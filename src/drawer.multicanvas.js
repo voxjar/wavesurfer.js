@@ -265,7 +265,7 @@ export default class MultiCanvas extends Drawer {
             channelIndex,
             start,
             end,
-            ({ absmax, hasMinVals, height, offsetY, halfH, peaks }) => {
+            ({ absmax, hasMinVals, height, offsetY, halfH, peaks, index }) => {
                 // if drawBars was called within ws.empty we don't pass a start and
                 // don't want anything to happen
                 if (start === undefined) {
@@ -293,11 +293,17 @@ export default class MultiCanvas extends Drawer {
                     const peak =
                         peaks[Math.floor(i * scale * peakIndexScale)] || 0;
                     const h = Math.round((peak / absmax) * halfH);
+                    // console.log(this.params.height)
+                    // index===1?console.log(offsetY): console.log(this.params.height-Math.abs(h))
                     this.fillRect(
                         i + this.halfPixel,
-                        halfH - h + offsetY,
+                        // halfH - Math.abs(h) + offsetY,
+                        index === 1
+                            ? this.params.height
+                            : this.params.height - Math.abs(h) + offsetY,
                         bar + this.halfPixel,
-                        h * 2
+                        Math.abs(h),
+                        index
                     );
                 }
             }
@@ -380,7 +386,7 @@ export default class MultiCanvas extends Drawer {
      * @param {number} width Width of the rectangle
      * @param {number} height Height of the rectangle
      */
-    fillRect(x, y, width, height) {
+    fillRect(x, y, width, height, index) {
         const startCanvas = Math.floor(x / this.maxCanvasWidth);
         const endCanvas = Math.min(
             Math.ceil((x + width) / this.maxCanvasWidth) + 1,
@@ -402,7 +408,7 @@ export default class MultiCanvas extends Drawer {
             };
 
             if (intersection.x1 < intersection.x2) {
-                this.setFillStyles(entry);
+                this.setFillStyles(entry, index);
 
                 entry.fillRects(
                     intersection.x1 - leftOffset,
@@ -459,6 +465,8 @@ export default class MultiCanvas extends Drawer {
 
             // Bar wave draws the bottom only as a reflection of the top,
             // so we don't need negative values
+            // console.log(this.params.height)
+            // console.log(channelIndex)
             const hasMinVals = [].some.call(peaks, val => val < 0);
             const height = this.params.height * this.params.pixelRatio;
             const offsetY = height * channelIndex || 0;
@@ -470,7 +478,8 @@ export default class MultiCanvas extends Drawer {
                 height: height,
                 offsetY: offsetY,
                 halfH: halfH,
-                peaks: peaks
+                peaks: peaks,
+                index: channelIndex
             });
         })();
     }
@@ -481,8 +490,16 @@ export default class MultiCanvas extends Drawer {
      * @private
      * @param {CanvasEntry} entry Target entry
      */
-    setFillStyles(entry) {
-        entry.setFillStyles(this.params.waveColor, this.params.progressColor);
+    setFillStyles(entry, index) {
+        index == 1
+            ? entry.setFillStyles(
+                  this.params.wave2Color || this.params.waveColor,
+                  this.params.progress2Color || this.params.progressColor
+              )
+            : entry.setFillStyles(
+                  this.params.waveColor,
+                  this.params.progressColor
+              );
     }
 
     /**

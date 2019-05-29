@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
         progressColor: 'purple',
         loaderColor: 'purple',
         cursorColor: 'navy',
+        splitChannels: true,
+        barWidth: '10',
+        barHeight: '2',
         plugins: [
             WaveSurfer.timeline.create({
                 container: '#wave-timeline'

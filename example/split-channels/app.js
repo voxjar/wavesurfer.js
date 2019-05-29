@@ -4,11 +4,18 @@ var wavesurfer;
 window.onload = function() {
     wavesurfer = WaveSurfer.create({
         container: document.querySelector('#waveform'),
-        splitChannels: true
+        waveColor: '#3f5fbf',
+        progressColor: 'green',
+        wave2Color: '#ffa500',
+        progress2Color: 'red',
+        splitChannels: true,
+        barWidth: '10',
+        barHeight: '2',
+        mediaControls: true
     });
 
     // Load audio from URL
-    wavesurfer.load('stereo.mp3');
+    wavesurfer.load('test.mp3');
 
     // Play/pause on button press
     document
