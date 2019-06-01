@@ -299,8 +299,10 @@ export default class MultiCanvas extends Drawer {
                         i + this.halfPixel,
                         // halfH - Math.abs(h) + offsetY,
                         index === 1
-                            ? this.params.height
-                            : this.params.height - Math.abs(h) + offsetY,
+                            ? this.params.height * this.params.pixelRatio
+                            : this.params.height * this.params.pixelRatio -
+                                  Math.abs(h) +
+                                  offsetY,
                         bar + this.halfPixel,
                         Math.abs(h),
                         index
