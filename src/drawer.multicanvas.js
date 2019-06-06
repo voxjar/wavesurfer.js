@@ -265,15 +265,24 @@ export default class MultiCanvas extends Drawer {
             channelIndex,
             start,
             end,
-            ({ absmax, hasMinVals, height, offsetY, halfH, peaks, index }) => {
+            ({
+                absmax,
+                hasMinVals,
+                height,
+                offsetY,
+                halfH,
+                peaks: pks,
+                index
+            }) => {
                 // if drawBars was called within ws.empty we don't pass a start and
                 // don't want anything to happen
                 if (start === undefined) {
                     return;
                 }
+                const mono = peaks.length === 1;
                 // Skip every other value if there are negatives.
                 const peakIndexScale = hasMinVals ? 2 : 1;
-                const length = peaks.length / peakIndexScale;
+                const length = pks.length / peakIndexScale;
                 const bar = this.params.barWidth * this.params.pixelRatio;
                 const gap =
                     this.params.barGap === null
@@ -291,20 +300,24 @@ export default class MultiCanvas extends Drawer {
 
                 for (i; i < last; i += step) {
                     const peak =
-                        peaks[Math.floor(i * scale * peakIndexScale)] || 0;
+                        pks[Math.floor(i * scale * peakIndexScale)] || 0;
                     const h = Math.round((peak / absmax) * halfH);
                     // console.log(this.params.height)
                     // index===1?console.log(offsetY): console.log(this.params.height-Math.abs(h))
+                    // x,y,w,h
+                    const y = mono
+                        ? halfH - Math.abs(h) + offsetY
+                        : index === 1
+                        ? this.params.height * this.params.pixelRatio
+                        : this.params.height * this.params.pixelRatio -
+                          Math.abs(h) +
+                          offsetY;
+                    const newH = mono ? Math.abs(h) * 2 : Math.abs(h);
                     this.fillRect(
                         i + this.halfPixel,
-                        // halfH - Math.abs(h) + offsetY,
-                        index === 1
-                            ? this.params.height * this.params.pixelRatio
-                            : this.params.height * this.params.pixelRatio -
-                                  Math.abs(h) +
-                                  offsetY,
+                        y,
                         bar + this.halfPixel,
-                        Math.abs(h),
+                        newH,
                         index
                     );
                 }
